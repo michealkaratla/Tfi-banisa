@@ -1,1 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Telugu Film Box Office Dashboard (2020‑2025)</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      color: #333;
+    }
+    header {
+      background: #222;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+    #searchBar {
+      width: 300px;
+      padding: 10px;
+      margin: 20px auto;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      display: block;
+    }
+    .movies-container {
+      display: grid;
+      /* Adjust columns as needed */
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .movie-card {
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .movie-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    .movie-image {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+    .movie-info {
+      padding: 15px;
+      flex: 1;
+    }
+    .movie-info h3 {
+      margin: 0 0 10px;
+      font-size: 1.2em;
+    }
+    .movie-info p {
+      margin: 5px 0;
+      font-size: 0.9em;
+    }
+    .movie-info .box-office {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .request-button {
+      background: #007BFF;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      margin: 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .request-button:hover {
+      background: #0056b3;
+      transform: scale(1.05);
+    }
+    /* For “no results” message */
+    #noResults {
+      text-align: center;
+      margin: 40px;
+      font-size: 1.2em;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Telugu Film Industry Box Office Dashboard (2020‑2025)</h1>
+  </header>
+
+  <input type="text" id="searchBar" placeholder="Search by movie name…">
+
+  <div class="movies-container" id="moviesContainer">
+    <!-- movie cards will be inserted here -->
+  </div>
+
+  <div id="noResults" style="display:none;">No movies found.</div>
+
+  <script>
+    // Sample data (you can expand it)
+    const movies = [
+      {
+        title: "Ala Vaikunthapurramuloo",
+        year: 2020,
+        indiaTotal: "₹233.35 Crore",
+        worldwideTotal: "₹260 Crore approx",
+        poster: "https://upload.wikimedia.org/wikipedia/en/0/0c/Ala_Vaikunthapurramuloo_poster.jpg"
+      },
+      {
+        title: "Sarileru Neekevvaru",
+        year: 2020,
+        indiaTotal: "₹260 Crore",
+        worldwideTotal: "₹260+ Crore",
+        poster: "https://upload.wikimedia.org/wikipedia/en/1/11/Sarileru_Neekevvaru_poster.jpg"
+      },
+      {
+        title: "Akhanda",
+        year: 2021,
+        indiaTotal: "₹150 Crore",
+        worldwideTotal: "₹150+ Crore",
+        poster: "https://upload.wikimedia.org/wikipedia/en/9/90/Akhanda_poster.jpg"
+      },
+      {
+        title: "Pushpa: The Rise",
+        year: 2021,
+        indiaTotal: "₹360‑375 Crore",
+        worldwideTotal: "₹360‑375 Crore",
+        poster: "https://upload.wikimedia.org/wikipedia/en/5/53/Pushpa_The_Rise_poster.jpg"
+      },
+      {
+        title: "RRR",
+        year: 2022,
+        indiaTotal: "Huge (Pan‑India)",
+        worldwideTotal: "₹1253‑₹1387 Crore",
+        poster: "https://upload.wikimedia.org/wikipedia/en/5/5f/RRR_poster.jpg"
+      },
+      {
+        title: "Kalki 2898 AD",
+        year: 2024,
+        indiaTotal: "₹1,042‑1,100 Crore",
+        worldwideTotal: "₹1,042‑1,100 Crore",
+        poster: "https://upload.wikimedia.org/wikipedia/en/8/8a/Kalki_2898_AD_poster.jpg"
+      },
+      {
+        title: "Pushpa 2: The Rule",
+        year: 2024,
+        indiaTotal: "≈ ₹1,642‑1,800 Crore",
+        worldwideTotal: "≈ ₹1,642‑1,800 Crore",
+        poster: "https://upload.wikimedia.org/wikipedia/en/c/c5/Pushpa_2_poster.jpg"
+      }
+      // add more entries as needed
+    ];
+
+    const container = document.getElementById('moviesContainer');
+    const searchBar = document.getElementById('searchBar');
+    const noResultsDiv = document.getElementById('noResults');
+
+    function displayMovies(list) {
+      container.innerHTML = '';
+      if (list.length === 0) {
+        noResultsDiv.style.display = 'block';
+        return;
+      } else {
+        noResultsDiv.style.display = 'none';
+      }
+      list.forEach(movie => {
+        const card = document.createElement('div');
+        card.className = 'movie-card';
+
+        const img = document.createElement('img');
+        img.className = 'movie-image';
+        img.src = movie.poster;
+        img.alt = movie.title;
+
+        const info = document.createElement('div');
+        info.className = 'movie-info';
+        const title = document.createElement('h3');
+        title.textContent = movie.title + " (" + movie.year + ")";
+        const india = document.createElement('p');
+        india.textContent = "India Total: " + movie.indiaTotal;
+        const world = document.createElement('p');
+        world.textContent = "Worldwide Total: " + movie.worldwideTotal;
+
+        const boxOffice = document.createElement('p');
+        boxOffice.className = 'box-office';
+        boxOffice.textContent = "Box Office Records";
+
+        const button = document.createElement('button');
+        button.className = 'request-button';
+        button.textContent = "Request Details";
+        button.onclick = function() {
+          alert("Request sent for " + movie.title);
+        };
+
+        info.appendChild(title);
+        info.appendChild(india);
+        info.appendChild(world);
+        info.appendChild(boxOffice);
+        info.appendChild(button);
+
+        card.appendChild(img);
+        card.appendChild(info);
+        container.appendChild(card);
+      });
+    }
+
+    // Initial display
+    displayMovies(movies);
+
+    // Search functionality
+    searchBar.addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase().trim();
+      const filtered = movies.filter(m => m.title.toLowerCase().includes(term));
+      displayMovies(filtered);
+    });
+  </script>
+</body>
+</html>
 
