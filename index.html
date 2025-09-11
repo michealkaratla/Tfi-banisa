@@ -2,220 +2,250 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Telugu Film Box Office Dashboard (2020‑2025)</title>
+  <title>Telugu Film Industry Box Office Dashboard (2020‑2025)</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
       color: #333;
     }
     header {
-      background: #222;
-      color: #fff;
+      background-color: #2c3e50;
+      color: white;
       padding: 20px;
       text-align: center;
     }
+    #searchContainer {
+      text-align: center;
+      margin: 20px 0;
+    }
     #searchBar {
       width: 300px;
-      padding: 10px;
-      margin: 20px auto;
+      padding: 10px 15px;
+      font-size: 16px;
       border: 1px solid #ccc;
-      border-radius: 4px;
-      display: block;
+      border-radius: 25px;
+      transition: all 0.3s;
+    }
+    #searchBar:focus {
+      outline: none;
+      border-color: #2980b9;
+      box-shadow: 0 0 5px rgba(41, 128, 185, 0.5);
     }
     .movies-container {
       display: grid;
-      /* Adjust columns as needed */
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 20px;
       padding: 20px;
     }
     .movie-card {
-      background: #fff;
+      background-color: white;
       border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       display: flex;
       flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
     }
     .movie-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     }
     .movie-image {
       width: 100%;
-      height: 150px;
-      object-fit: cover;
+      height: 0;
+      padding-bottom: 150%; /* aspect ratio */
+      background-size: cover;
+      background-position: center;
     }
     .movie-info {
       padding: 15px;
       flex: 1;
+      display: flex;
+      flex-direction: column;
     }
-    .movie-info h3 {
-      margin: 0 0 10px;
-      font-size: 1.2em;
+    .movie-title {
+      font-size: 18px;
+      margin: 0 0 8px;
+      color: #2c3e50;
     }
-    .movie-info p {
-      margin: 5px 0;
-      font-size: 0.9em;
+    .movie-year {
+      font-size: 14px;
+      color: #777;
+      margin-bottom: 10px;
     }
-    .movie-info .box-office {
+    .movie-boxoffice {
+      margin-top: auto;
       font-weight: bold;
-      margin-top: 10px;
+      color: #27ae60;
     }
     .request-button {
-      background: #007BFF;
-      color: #fff;
-      border: none;
+      margin-top: 15px;
       padding: 10px;
-      margin: 15px;
+      border: none;
       border-radius: 4px;
+      background-color: #2980b9;
+      color: white;
       cursor: pointer;
-      transition: background 0.2s, transform 0.2s;
+      transition: background-color 0.2s, transform 0.2s;
     }
     .request-button:hover {
-      background: #0056b3;
+      background-color: #1c5980;
       transform: scale(1.05);
     }
-    /* For “no results” message */
     #noResults {
       text-align: center;
-      margin: 40px;
-      font-size: 1.2em;
-      color: #666;
+      margin: 50px;
+      font-size: 18px;
+      color: #999;
+      display: none;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #777;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
+
   <header>
-    <h1>Telugu Film Industry Box Office Dashboard (2020‑2025)</h1>
+    <h1>Telugu Film Box Office Records (2020‑2025)</h1>
   </header>
 
-  <input type="text" id="searchBar" placeholder="Search by movie name…">
-
-  <div class="movies-container" id="moviesContainer">
-    <!-- movie cards will be inserted here -->
+  <div id="searchContainer">
+    <input type="text" id="searchBar" placeholder="Search movie by title…" />
   </div>
 
-  <div id="noResults" style="display:none;">No movies found.</div>
+  <div class="movies-container" id="moviesContainer">
+    <!-- Movie cards get inserted here via JS -->
+  </div>
+
+  <div id="noResults">No movies found matching your search.</div>
+
+  <footer>
+    Data sources: Wikipedia, Box Office reports & public domain info.
+  </footer>
 
   <script>
-    // Sample data (you can expand it)
+    // Sample data for some Telugu films (2020‑2025)
+    // You can extend / replace / fetch from API
     const movies = [
       {
         title: "Ala Vaikunthapurramuloo",
         year: 2020,
-        indiaTotal: "₹233.35 Crore",
-        worldwideTotal: "₹260 Crore approx",
+        boxOffice: "₹233.35 Crore (Domestic) :contentReference[oaicite:0]{index=0}",
         poster: "https://upload.wikimedia.org/wikipedia/en/0/0c/Ala_Vaikunthapurramuloo_poster.jpg"
       },
       {
         title: "Sarileru Neekevvaru",
         year: 2020,
-        indiaTotal: "₹260 Crore",
-        worldwideTotal: "₹260+ Crore",
+        boxOffice: "₹260 Crore gross :contentReference[oaicite:1]{index=1}",
         poster: "https://upload.wikimedia.org/wikipedia/en/1/11/Sarileru_Neekevvaru_poster.jpg"
+      },
+      {
+        title: "Krack",
+        year: 2021,
+        boxOffice: "₹70.6 Crore approx :contentReference[oaicite:2]{index=2}",
+        poster: "https://upload.wikimedia.org/wikipedia/en/d/d6/Krack%281%29_poster.jpg"
       },
       {
         title: "Akhanda",
         year: 2021,
-        indiaTotal: "₹150 Crore",
-        worldwideTotal: "₹150+ Crore",
+        boxOffice: "₹150 Crore approx :contentReference[oaicite:3]{index=3}",
         poster: "https://upload.wikimedia.org/wikipedia/en/9/90/Akhanda_poster.jpg"
       },
       {
         title: "Pushpa: The Rise",
         year: 2021,
-        indiaTotal: "₹360‑375 Crore",
-        worldwideTotal: "₹360‑375 Crore",
+        boxOffice: "₹360‑393.5 Crore worldwide :contentReference[oaicite:4]{index=4}",
         poster: "https://upload.wikimedia.org/wikipedia/en/5/53/Pushpa_The_Rise_poster.jpg"
+      },
+      {
+        title: "Bheemla Nayak",
+        year: 2022,
+        boxOffice: "₹192 Crore approx :contentReference[oaicite:5]{index=5}",
+        poster: "https://upload.wikimedia.org/wikipedia/en/3/32/Bheemla_Nayak_poster.jpg"
       },
       {
         title: "RRR",
         year: 2022,
-        indiaTotal: "Huge (Pan‑India)",
-        worldwideTotal: "₹1253‑₹1387 Crore",
+        boxOffice: "₹1,100‑1,250 Crore approx worldwide :contentReference[oaicite:6]{index=6}",
         poster: "https://upload.wikimedia.org/wikipedia/en/5/5f/RRR_poster.jpg"
-      },
-      {
-        title: "Kalki 2898 AD",
-        year: 2024,
-        indiaTotal: "₹1,042‑1,100 Crore",
-        worldwideTotal: "₹1,042‑1,100 Crore",
-        poster: "https://upload.wikimedia.org/wikipedia/en/8/8a/Kalki_2898_AD_poster.jpg"
-      },
-      {
-        title: "Pushpa 2: The Rule",
-        year: 2024,
-        indiaTotal: "≈ ₹1,642‑1,800 Crore",
-        worldwideTotal: "≈ ₹1,642‑1,800 Crore",
-        poster: "https://upload.wikimedia.org/wikipedia/en/c/c5/Pushpa_2_poster.jpg"
       }
-      // add more entries as needed
+      // Add more movies from 2023, 2024, 2025 here similarly
     ];
 
-    const container = document.getElementById('moviesContainer');
+    const moviesContainer = document.getElementById('moviesContainer');
     const searchBar = document.getElementById('searchBar');
     const noResultsDiv = document.getElementById('noResults');
 
+    function createMovieCard(movie) {
+      const card = document.createElement('div');
+      card.className = 'movie-card';
+
+      const imgDiv = document.createElement('div');
+      imgDiv.className = 'movie-image';
+      imgDiv.style.backgroundImage = `url('${movie.poster}')`;
+
+      const infoDiv = document.createElement('div');
+      infoDiv.className = 'movie-info';
+
+      const titleEl = document.createElement('h2');
+      titleEl.className = 'movie-title';
+      titleEl.textContent = movie.title;
+
+      const yearEl = document.createElement('div');
+      yearEl.className = 'movie-year';
+      yearEl.textContent = `Year: ${movie.year}`;
+
+      const boxOfficeEl = document.createElement('div');
+      boxOfficeEl.className = 'movie-boxoffice';
+      boxOfficeEl.textContent = `Box Office: ${movie.boxOffice}`;
+
+      const btn = document.createElement('button');
+      btn.className = 'request-button';
+      btn.textContent = 'Request Details';
+      btn.addEventListener('click', function(){
+        alert(`Details requested for "${movie.title}"`);
+      });
+
+      infoDiv.appendChild(titleEl);
+      infoDiv.appendChild(yearEl);
+      infoDiv.appendChild(boxOfficeEl);
+      infoDiv.appendChild(btn);
+
+      card.appendChild(imgDiv);
+      card.appendChild(infoDiv);
+
+      return card;
+    }
+
     function displayMovies(list) {
-      container.innerHTML = '';
+      moviesContainer.innerHTML = '';
       if (list.length === 0) {
         noResultsDiv.style.display = 'block';
-        return;
       } else {
         noResultsDiv.style.display = 'none';
+        list.forEach(movie => {
+          const card = createMovieCard(movie);
+          moviesContainer.appendChild(card);
+        });
       }
-      list.forEach(movie => {
-        const card = document.createElement('div');
-        card.className = 'movie-card';
-
-        const img = document.createElement('img');
-        img.className = 'movie-image';
-        img.src = movie.poster;
-        img.alt = movie.title;
-
-        const info = document.createElement('div');
-        info.className = 'movie-info';
-        const title = document.createElement('h3');
-        title.textContent = movie.title + " (" + movie.year + ")";
-        const india = document.createElement('p');
-        india.textContent = "India Total: " + movie.indiaTotal;
-        const world = document.createElement('p');
-        world.textContent = "Worldwide Total: " + movie.worldwideTotal;
-
-        const boxOffice = document.createElement('p');
-        boxOffice.className = 'box-office';
-        boxOffice.textContent = "Box Office Records";
-
-        const button = document.createElement('button');
-        button.className = 'request-button';
-        button.textContent = "Request Details";
-        button.onclick = function() {
-          alert("Request sent for " + movie.title);
-        };
-
-        info.appendChild(title);
-        info.appendChild(india);
-        info.appendChild(world);
-        info.appendChild(boxOffice);
-        info.appendChild(button);
-
-        card.appendChild(img);
-        card.appendChild(info);
-        container.appendChild(card);
-      });
     }
 
     // Initial display
     displayMovies(movies);
 
     // Search functionality
-    searchBar.addEventListener('input', (e) => {
-      const term = e.target.value.toLowerCase().trim();
-      const filtered = movies.filter(m => m.title.toLowerCase().includes(term));
+    searchBar.addEventListener('input', function(e) {
+      const searchTerm = e.target.value.toLowerCase().trim();
+      const filtered = movies.filter(m => m.title.toLowerCase().includes(searchTerm));
       displayMovies(filtered);
     });
   </script>
