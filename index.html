@@ -2,11 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Telugu Film Industry Box Office Dashboard (2020‑2025)</title>
+  <title>Telugu Film Industry Box Office Dashboard (2020-2025)</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -19,19 +17,22 @@
       padding: 20px;
       text-align: center;
     }
-    #searchContainer {
+    #controls {
       text-align: center;
       margin: 20px 0;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
     }
-    #searchBar {
-      width: 300px;
+    #searchBar, #sortSelect {
       padding: 10px 15px;
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 25px;
       transition: all 0.3s;
     }
-    #searchBar:focus {
+    #searchBar:focus, #sortSelect:focus {
       outline: none;
       border-color: #2980b9;
       box-shadow: 0 0 5px rgba(41, 128, 185, 0.5);
@@ -110,80 +111,119 @@
       color: #777;
       font-size: 14px;
     }
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 10px;
+      max-width: 500px;
+      width: 90%;
+      padding: 20px;
+      position: relative;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.9);}
+      to { opacity: 1; transform: scale(1);}
+    }
+    .close-btn {
+      position: absolute;
+      top: 10px; right: 15px;
+      font-size: 20px;
+      cursor: pointer;
+      color: #333;
+    }
+    .modal img {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    .modal h2 {
+      margin: 0 0 10px;
+      color: #2c3e50;
+    }
+    .modal p {
+      margin: 5px 0;
+    }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>Telugu Film Box Office Records (2020‑2025)</h1>
+    <h1>Telugu Film Box Office Records (2020-2025)</h1>
   </header>
 
-  <div id="searchContainer">
+  <div id="controls">
     <input type="text" id="searchBar" placeholder="Search movie by title…" />
+    <select id="sortSelect">
+      <option value="year">Sort by Year</option>
+      <option value="title">Sort by Title</option>
+      <option value="boxOffice">Sort by Box Office</option>
+    </select>
   </div>
 
-  <div class="movies-container" id="moviesContainer">
-    <!-- Movie cards get inserted here via JS -->
-  </div>
-
+  <div class="movies-container" id="moviesContainer"></div>
   <div id="noResults">No movies found matching your search.</div>
 
   <footer>
     Data sources: Wikipedia, Box Office reports & public domain info.
   </footer>
 
+  <!-- Modal -->
+  <div class="modal" id="movieModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeModal">&times;</span>
+      <img id="modalPoster" src="" alt="Poster">
+      <h2 id="modalTitle"></h2>
+      <p><strong>Year:</strong> <span id="modalYear"></span></p>
+      <p><strong>Box Office:</strong> <span id="modalBoxOffice"></span></p>
+      <p><strong>Director:</strong> <span id="modalDirector"></span></p>
+      <p><strong>Lead Actors:</strong> <span id="modalActors"></span></p>
+      <p><strong>Genre:</strong> <span id="modalGenre"></span></p>
+    </div>
+  </div>
+
   <script>
-    // Sample data for some Telugu films (2020‑2025)
-    // You can extend / replace / fetch from API
     const movies = [
-      {
-        title: "Ala Vaikunthapurramuloo",
-        year: 2020,
-        boxOffice: "₹233.35 Crore (Domestic) :contentReference[oaicite:0]{index=0}",
-        poster: "https://upload.wikimedia.org/wikipedia/en/0/0c/Ala_Vaikunthapurramuloo_poster.jpg"
-      },
-      {
-        title: "Sarileru Neekevvaru",
-        year: 2020,
-        boxOffice: "₹260 Crore gross :contentReference[oaicite:1]{index=1}",
-        poster: "https://upload.wikimedia.org/wikipedia/en/1/11/Sarileru_Neekevvaru_poster.jpg"
-      },
-      {
-        title: "Krack",
-        year: 2021,
-        boxOffice: "₹70.6 Crore approx :contentReference[oaicite:2]{index=2}",
-        poster: "https://upload.wikimedia.org/wikipedia/en/d/d6/Krack%281%29_poster.jpg"
-      },
-      {
-        title: "Akhanda",
-        year: 2021,
-        boxOffice: "₹150 Crore approx :contentReference[oaicite:3]{index=3}",
-        poster: "https://upload.wikimedia.org/wikipedia/en/9/90/Akhanda_poster.jpg"
-      },
-      {
-        title: "Pushpa: The Rise",
-        year: 2021,
-        boxOffice: "₹360‑393.5 Crore worldwide :contentReference[oaicite:4]{index=4}",
-        poster: "https://upload.wikimedia.org/wikipedia/en/5/53/Pushpa_The_Rise_poster.jpg"
-      },
-      {
-        title: "Bheemla Nayak",
-        year: 2022,
-        boxOffice: "₹192 Crore approx :contentReference[oaicite:5]{index=5}",
-        poster: "https://upload.wikimedia.org/wikipedia/en/3/32/Bheemla_Nayak_poster.jpg"
-      },
-      {
-        title: "RRR",
-        year: 2022,
-        boxOffice: "₹1,100‑1,250 Crore approx worldwide :contentReference[oaicite:6]{index=6}",
-        poster: "https://upload.wikimedia.org/wikipedia/en/5/5f/RRR_poster.jpg"
-      }
-      // Add more movies from 2023, 2024, 2025 here similarly
+      { title: "Ala Vaikunthapurramuloo", year: 2020, boxOffice: "₹233 Cr", poster: "https://upload.wikimedia.org/wikipedia/en/0/0c/Ala_Vaikunthapurramuloo_poster.jpg", director:"Trivikram Srinivas", actors:"Allu Arjun, Pooja Hegde", genre:"Action/Drama", value:233 },
+      { title: "Sarileru Neekevvaru", year: 2020, boxOffice: "₹260 Cr", poster: "https://upload.wikimedia.org/wikipedia/en/1/11/Sarileru_Neekevvaru_poster.jpg", director:"Anil Ravipudi", actors:"Mahesh Babu, Rashmika Mandanna", genre:"Action/Comedy", value:260 },
+      { title: "Krack", year: 2021, boxOffice: "₹70.6 Cr", poster: "https://upload.wikimedia.org/wikipedia/en/d/d6/Krack%281%29_poster.jpg", director:"Gopichand Malineni", actors:"Ravi Teja, Shruti Haasan", genre:"Action", value:70.6 },
+      { title: "Akhanda", year: 2021, boxOffice: "₹150 Cr", poster: "https://upload.wikimedia.org/wikipedia/en/9/90/Akhanda_poster.jpg", director:"Boyapati Srinu", actors:"Nandamuri Balakrishna", genre:"Action/Fantasy", value:150 },
+      { title: "Pushpa: The Rise", year: 2021, boxOffice: "₹360-393 Cr", poster: "https://upload.wikimedia.org/wikipedia/en/5/53/Pushpa_The_Rise_poster.jpg", director:"Sukumar", actors:"Allu Arjun, Rashmika Mandanna", genre:"Action/Drama", value:360 },
+      { title: "Bheemla Nayak", year: 2022, boxOffice: "₹192 Cr", poster: "https://upload.wikimedia.org/wikipedia/en/3/32/Bheemla_Nayak_poster.jpg", director:"Saagar K Chandra", actors:"Pawan Kalyan, Rana Daggubati", genre:"Action/Drama", value:192 },
+      { title: "RRR", year: 2022, boxOffice: "₹1200 Cr", poster: "https://upload.wikimedia.org/wikipedia/en/5/5f/RRR_poster.jpg", director:"S. S. Rajamouli", actors:"N. T. Rama Rao Jr., Ram Charan", genre:"Epic Action/Drama", value:1200 },
+      { title: "Waltair Veerayya", year: 2023, boxOffice: "₹230 Cr", poster: "https://upload.wikimedia.org/wikipedia/en/d/d3/Waltair_Veerayya_poster.jpg", director:"Bobby Kolli", actors:"Chiranjeevi, Ravi Teja", genre:"Action/Comedy", value:230 },
+      { title: "Dasara", year: 2023, boxOffice: "₹135 Cr", poster: "https://upload.wikimedia.org/wikipedia/en/9/99/Dasara_film_poster.jpg", director:"Srikanth Odela", actors:"Nani, Keerthy Suresh", genre:"Action/Drama", value:135 },
+      { title: "Salaar: Part 1 – Ceasefire", year: 2023, boxOffice: "₹715 Cr", poster: "https://upload.wikimedia.org/wikipedia/en/6/6d/Salaar_2023_film.jpg", director:"Prashanth Neel", actors:"Prabhas, Prithviraj Sukumaran", genre:"Action/Thriller", value:715 },
+      { title: "Devara: Part 1", year: 2024, boxOffice: "₹400 Cr (est)", poster: "https://upload.wikimedia.org/wikipedia/en/3/37/Devara_Part_1_poster.jpg", director:"Koratala Siva", actors:"N. T. Rama Rao Jr., Janhvi Kapoor", genre:"Action/Drama", value:400 },
+      { title: "Pushpa 2: The Rule", year: 2024, boxOffice: "₹700 Cr (est)", poster: "https://upload.wikimedia.org/wikipedia/en/8/8d/Pushpa_2_The_Rule.jpg", director:"Sukumar", actors:"Allu Arjun, Rashmika Mandanna", genre:"Action/Drama", value:700 },
+      { title: "Game Changer", year: 2025, boxOffice: "Upcoming", poster: "https://upload.wikimedia.org/wikipedia/en/d/d1/Game_Changer_poster.jpg", director:"S. Shankar", actors:"Ram Charan, Kiara Advani", genre:"Political Thriller", value:0 }
     ];
 
     const moviesContainer = document.getElementById('moviesContainer');
     const searchBar = document.getElementById('searchBar');
+    const sortSelect = document.getElementById('sortSelect');
     const noResultsDiv = document.getElementById('noResults');
+
+    // Modal elements
+    const modal = document.getElementById('movieModal');
+    const closeModal = document.getElementById('closeModal');
+    const modalPoster = document.getElementById('modalPoster');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalYear = document.getElementById('modalYear');
+    const modalBoxOffice = document.getElementById('modalBoxOffice');
+    const modalDirector = document.getElementById('modalDirector');
+    const modalActors = document.getElementById('modalActors');
+    const modalGenre = document.getElementById('modalGenre');
 
     function createMovieCard(movie) {
       const card = document.createElement('div');
@@ -212,7 +252,7 @@
       btn.className = 'request-button';
       btn.textContent = 'Request Details';
       btn.addEventListener('click', function(){
-        alert(`Details requested for "${movie.title}"`);
+        showModal(movie);
       });
 
       infoDiv.appendChild(titleEl);
@@ -239,16 +279,42 @@
       }
     }
 
-    // Initial display
-    displayMovies(movies);
+    function showModal(movie) {
+      modalPoster.src = movie.poster;
+      modalTitle.textContent = movie.title;
+      modalYear.textContent = movie.year;
+      modalBoxOffice.textContent = movie.boxOffice;
+      modalDirector.textContent = movie.director;
+      modalActors.textContent = movie.actors;
+      modalGenre.textContent = movie.genre;
+      modal.style.display = 'flex';
+    }
 
-    // Search functionality
-    searchBar.addEventListener('input', function(e) {
-      const searchTerm = e.target.value.toLowerCase().trim();
-      const filtered = movies.filter(m => m.title.toLowerCase().includes(searchTerm));
+    closeModal.onclick = () => modal.style.display = 'none';
+    window.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; }
+
+    function applyFilters() {
+      const searchTerm = searchBar.value.toLowerCase().trim();
+      let filtered = movies.filter(m => m.title.toLowerCase().includes(searchTerm));
+
+      const sortValue = sortSelect.value;
+      if (sortValue === 'year') {
+        filtered.sort((a,b) => b.year - a.year);
+      } else if (sortValue === 'title') {
+        filtered.sort((a,b) => a.title.localeCompare(b.title));
+      } else if (sortValue === 'boxOffice') {
+        filtered.sort((a,b) => b.value - a.value);
+      }
+
       displayMovies(filtered);
-    });
+    }
+
+    // Event listeners
+    searchBar.addEventListener('input', applyFilters);
+    sortSelect.addEventListener('change', applyFilters);
+
+    // Initial display
+    applyFilters();
   </script>
 </body>
 </html>
-
